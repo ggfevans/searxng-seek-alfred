@@ -7,7 +7,64 @@
 	<key>category</key>
 	<string>Internet</string>
 	<key>connections</key>
-	<dict/>
+	<dict>
+		<key>A7087C90-0C31-4269-983C-868379879BA7</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A597C019-17C0-4EFC-8209-C78914AB31B3</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A597C019-17C0-4EFC-8209-C78914AB31B3</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A597C019-17C0-4EFC-8209-C78914AB31B3</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>A597C019-17C0-4EFC-8209-C78914AB31B3</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>110802D2-8EA0-42A2-9E3F-EF61E70504E7</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>0220E219-39E7-431D-A3D4-D3AB3583A16B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string>right</string>
+			</dict>
+		</array>
+	</dict>
 	<key>createdby</key>
 	<string>ggfevans</string>
 	<key>description</key>
@@ -17,13 +74,227 @@
 	<key>name</key>
 	<string>Alfred-SearXNG-Workflow</string>
 	<key>objects</key>
-	<array/>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>2</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>sx</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Searching SearXNG...</string>
+				<key>script</key>
+				<string></string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string>scripts/search.js</string>
+				<key>subtext</key>
+				<string>Search your SearXNG instance</string>
+				<key>title</key>
+				<string>SearXNG Search</string>
+				<key>type</key>
+				<integer>8</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A7087C90-0C31-4269-983C-868379879BA7</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:action}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>copy</string>
+						<key>outputlabel</key>
+						<string>Copy URL</string>
+						<key>uid</key>
+						<string>copy-condition</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>Open URL</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>A597C019-17C0-4EFC-8209-C78914AB31B3</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>110802D2-8EA0-42A2-9E3F-EF61E70504E7</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>0220E219-39E7-431D-A3D4-D3AB3583A16B</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+	</array>
 	<key>readme</key>
-	<string></string>
+	<string>Search your personal SearXNG instance directly from Alfred.
+
+## Setup
+
+1. Set your SearXNG URL in the workflow configuration
+2. Ensure your SearXNG instance has JSON format enabled in settings.yml:
+
+   search:
+     formats:
+       - html
+       - json
+
+## Usage
+
+- Type `sx` followed by your search query
+- Press Enter to open the result in your browser
+- Press Cmd to copy the URL
+- Press Option to open the search in SearXNG web interface
+- Press Shift for Quick Look preview
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Enter | Open URL in browser |
+| Cmd | Copy URL to clipboard |
+| Option | View in SearXNG web UI |
+| Shift | Quick Look preview |
+</string>
 	<key>uidata</key>
-	<dict/>
+	<dict>
+		<key>A7087C90-0C31-4269-983C-868379879BA7</key>
+		<dict>
+			<key>xpos</key>
+			<real>50</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>A597C019-17C0-4EFC-8209-C78914AB31B3</key>
+		<dict>
+			<key>xpos</key>
+			<real>270</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>110802D2-8EA0-42A2-9E3F-EF61E70504E7</key>
+		<dict>
+			<key>xpos</key>
+			<real>490</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>0220E219-39E7-431D-A3D4-D3AB3583A16B</key>
+		<dict>
+			<key>xpos</key>
+			<real>490</real>
+			<key>ypos</key>
+			<real>170</real>
+		</dict>
+	</dict>
 	<key>userconfigurationconfig</key>
-	<array/>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>https://search.example.com</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>The URL of your SearXNG instance (e.g., https://search.example.com). The instance must have JSON format enabled in settings.yml.</string>
+			<key>label</key>
+			<string>SearXNG URL</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>searxng_url</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>5000</string>
+				<key>placeholder</key>
+				<string>5000</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Request timeout in milliseconds. Increase if your SearXNG instance is slow or on a high-latency connection.</string>
+			<key>label</key>
+			<string>Timeout (ms)</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>timeout_ms</string>
+		</dict>
+	</array>
+	<key>version</key>
+	<string>1.0.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/ggfevans/Alfred-SearXNG-Workflow</string>
 </dict>
