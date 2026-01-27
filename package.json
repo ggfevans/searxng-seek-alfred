@@ -1,6 +1,6 @@
 {
   "name": "alfred-searxng-workflow",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Alfred workflow for searching with SearXNG",
   "scripts": {

@@ -8,6 +8,29 @@
 	<string>Internet</string>
 	<key>connections</key>
 	<dict>
+		<key>A597C019-17C0-4EFC-8209-C78914AB31B3</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>110802D2-8EA0-42A2-9E3F-EF61E70504E7</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>0220E219-39E7-431D-A3D4-D3AB3583A16B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string>right</string>
+			</dict>
+		</array>
 		<key>A7087C90-0C31-4269-983C-868379879BA7</key>
 		<array>
 			<dict>
@@ -39,29 +62,6 @@
 				<string></string>
 				<key>vitowards</key>
 				<string></string>
-			</dict>
-		</array>
-		<key>A597C019-17C0-4EFC-8209-C78914AB31B3</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>110802D2-8EA0-42A2-9E3F-EF61E70504E7</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitowards</key>
-				<string></string>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>0220E219-39E7-431D-A3D4-D3AB3583A16B</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitowards</key>
-				<string>right</string>
 			</dict>
 		</array>
 	</dict>
@@ -232,10 +232,17 @@ Favicons are fetched through your own SearXNG instance's favicon proxy, preservi
 </string>
 	<key>uidata</key>
 	<dict>
-		<key>A7087C90-0C31-4269-983C-868379879BA7</key>
+		<key>0220E219-39E7-431D-A3D4-D3AB3583A16B</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>490</real>
+			<key>ypos</key>
+			<real>170</real>
+		</dict>
+		<key>110802D2-8EA0-42A2-9E3F-EF61E70504E7</key>
+		<dict>
+			<key>xpos</key>
+			<real>490</real>
 			<key>ypos</key>
 			<real>50</real>
 		</dict>
@@ -246,19 +253,12 @@ Favicons are fetched through your own SearXNG instance's favicon proxy, preservi
 			<key>ypos</key>
 			<real>50</real>
 		</dict>
-		<key>110802D2-8EA0-42A2-9E3F-EF61E70504E7</key>
+		<key>A7087C90-0C31-4269-983C-868379879BA7</key>
 		<dict>
 			<key>xpos</key>
-			<real>490</real>
+			<real>50</real>
 			<key>ypos</key>
 			<real>50</real>
-		</dict>
-		<key>0220E219-39E7-431D-A3D4-D3AB3583A16B</key>
-		<dict>
-			<key>xpos</key>
-			<real>490</real>
-			<key>ypos</key>
-			<real>170</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -328,7 +328,7 @@ Favicons are fetched through your own SearXNG instance's favicon proxy, preservi
 		</dict>
 	</array>
 	<key>version</key>
-	<string>1.0.0</string>
+	<string>0.1.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/ggfevans/Alfred-SearXNG-Workflow</string>
 </dict>
