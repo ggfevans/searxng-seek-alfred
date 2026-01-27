@@ -1,0 +1,12 @@
+{
+  "name": "alfred-searxng-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Alfred workflow for searching with SearXNG",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

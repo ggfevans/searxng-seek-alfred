@@ -7,3 +7,6 @@ prefs.plist
 
 # Local config (use .env.example as template)
 .env
+
+# Node
+node_modules/
