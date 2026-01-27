@@ -137,6 +137,161 @@ function httpGet(url, timeoutSecs) {
 }
 
 // ============================================================================
+// FAVICON CACHING
+// ============================================================================
+
+// Import Foundation for NSFileManager
+ObjC.import("Foundation");
+
+// Track favicon fetches per search to limit network requests
+let faviconFetchesThisSearch = 0;
+const MAX_FAVICON_FETCHES_PER_SEARCH = 3;
+
+// Memoized directory paths (initialized on first use)
+let cachedWorkflowDataDir = null;
+let cachedFaviconDir = null;
+
+/**
+ * Get the workflow data directory path.
+ * Creates the directory if it doesn't exist. Memoized for performance.
+ * @returns {string} Absolute path to workflow data directory
+ */
+function getWorkflowDataDir() {
+	if (cachedWorkflowDataDir) {
+		return cachedWorkflowDataDir;
+	}
+
+	let dataDir;
+	try {
+		// Try Alfred's environment variable first
+		dataDir = $.getenv("alfred_workflow_data");
+	} catch {
+		// Fallback: construct from bundle ID
+		const home = $.getenv("HOME");
+		const bundleId = "com.ggfevans.alfred-searxng";
+		dataDir = `${home}/Library/Application Support/Alfred/Workflow Data/${bundleId}`;
+	}
+
+	// Create directory if needed (mkdir -p is idempotent)
+	app.doShellScript(`mkdir -p ${shellEscape(dataDir)}`);
+
+	cachedWorkflowDataDir = dataDir;
+	return dataDir;
+}
+
+/**
+ * Get the favicons cache directory path.
+ * Creates the directory if it doesn't exist. Memoized for performance.
+ * @returns {string} Absolute path to favicons directory
+ */
+function getCacheDir() {
+	if (cachedFaviconDir) {
+		return cachedFaviconDir;
+	}
+
+	const cacheDir = `${getWorkflowDataDir()}/favicons`;
+	app.doShellScript(`mkdir -p ${shellEscape(cacheDir)}`);
+
+	cachedFaviconDir = cacheDir;
+	return cacheDir;
+}
+
+/**
+ * Check if a file exists using NSFileManager (faster than shell).
+ * @param {string} path - File path to check
+ * @returns {boolean} True if file exists
+ */
+function fileExists(path) {
+	return $.NSFileManager.defaultManager.fileExistsAtPath(path);
+}
+
+/**
+ * Check if a favicon is cached for the given domain.
+ * @param {string} domain - Domain name (e.g., "github.com")
+ * @returns {string|null} Path to cached favicon or null if not cached
+ */
+function getCachedFavicon(domain) {
+	const cacheDir = getCacheDir();
+	const faviconPath = `${cacheDir}/${domain}.png`;
+
+	if (fileExists(faviconPath)) {
+		return faviconPath;
+	}
+	return null;
+}
+
+/**
+ * Fetch favicon from Google's favicon service and save to cache.
+ * Uses https://www.google.com/s2/favicons service for reliable favicon retrieval.
+ * @param {string} domain - Domain name (e.g., "github.com")
+ * @returns {string|null} Path to saved favicon or null on failure
+ */
+function fetchFavicon(domain) {
+	const cacheDir = getCacheDir();
+	const faviconPath = `${cacheDir}/${domain}.png`;
+
+	// Google favicon service URL (sz=64 for higher resolution)
+	const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+
+	try {
+		// Download favicon with curl
+		// --silent: No progress output
+		// --location: Follow redirects
+		// --max-time 1: 1 second timeout (keep UI responsive)
+		// --output: Save directly to file
+		const curlCmd = `curl --silent --location --max-time 1 --output ${shellEscape(faviconPath)} -- ${shellEscape(faviconUrl)}`;
+		app.doShellScript(curlCmd);
+
+		// Verify file was created and has content
+		const fileSize = app.doShellScript(`stat -f%z ${shellEscape(faviconPath)} 2>/dev/null || echo 0`);
+		if (Number.parseInt(fileSize, 10) > 0) {
+			return faviconPath;
+		}
+
+		// Empty file - delete it and return null
+		app.doShellScript(`rm -f ${shellEscape(faviconPath)}`);
+		return null;
+	} catch {
+		// curl failed - clean up any partial file
+		try {
+			app.doShellScript(`rm -f ${shellEscape(faviconPath)}`);
+		} catch {
+			/* ignore cleanup errors */
+		}
+		return null;
+	}
+}
+
+/**
+ * Get favicon path for a domain, fetching and caching if needed.
+ * @param {string} domain - Domain name (e.g., "github.com")
+ * @returns {string} Path to favicon (cached, fetched, or generic fallback)
+ */
+function getFaviconPath(domain) {
+	// Check cache first
+	const cached = getCachedFavicon(domain);
+	if (cached) {
+		return cached;
+	}
+
+	// Limit new fetches to keep search responsive
+	if (faviconFetchesThisSearch >= MAX_FAVICON_FETCHES_PER_SEARCH) {
+		return "icon.png";
+	}
+
+	faviconFetchesThisSearch++;
+
+	// Try to fetch and cache
+	const fetched = fetchFavicon(domain);
+	if (fetched) {
+		return fetched;
+	}
+
+	// Fallback to generic icon
+	return "icon.png";
+}
+
+// ============================================================================
 // ALFRED OUTPUT HELPERS
 // ============================================================================
 
@@ -194,10 +349,14 @@ function resultToAlfredItem(result, query, searxngUrl) {
 	const subtitle = snippet ? `${domain} · ${snippet}` : domain;
 	const searchUrl = `${searxngUrl}/search?q=${encodeURIComponent(query)}`;
 
+	// Get favicon for this domain
+	const iconPath = getFaviconPath(domain);
+
 	return {
 		title: result.title || result.url,
 		subtitle: subtitle,
 		arg: result.url,
+		icon: { path: iconPath },
 		quicklookurl: result.url,
 		match: alfredMatcher(result.title) + " " + alfredMatcher(snippet),
 		mods: {
@@ -224,6 +383,9 @@ function resultToAlfredItem(result, query, searxngUrl) {
  * @returns {object} Alfred response object
  */
 function search(query) {
+	// Reset favicon fetch counter for this search
+	faviconFetchesThisSearch = 0;
+
 	// Remove trailing slash from URL if present
 	const searxngUrl = CONFIG.searxngUrl.replace(/\/+$/, "");
 	const timeoutMs = CONFIG.timeoutMs;
