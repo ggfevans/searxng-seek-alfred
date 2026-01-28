@@ -716,6 +716,31 @@ function search(query) {
 		};
 	}
 
+	const timeoutSecs = Math.ceil(timeoutMs / 1000);
+
+	// Fetch autocomplete suggestions (always, for any query length)
+	const suggestions = fetchAutocomplete(cleanQuery, searxngUrl, timeoutSecs);
+	const suggestionItems = suggestions.map((s) =>
+		suggestionToAlfredItem(s, parsed.category, parsed.timeRange)
+	);
+
+	// Short queries: return autocomplete only for speed
+	if (!shouldShowFullResults(cleanQuery)) {
+		const items = [...suggestionItems];
+		// Add fallback if no suggestions
+		if (items.length === 0) {
+			items.push(fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange));
+		}
+		return {
+			items: items,
+			cache: {
+				seconds: 30,
+				loosereload: true,
+			},
+		};
+	}
+
+	// Longer queries: fetch full results too
 	// Build search URL with optional category and time_range
 	let searchUrl = `${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}&format=json`;
 	if (parsed.category) {
@@ -724,7 +749,6 @@ function search(query) {
 	if (parsed.timeRange) {
 		searchUrl += `&time_range=${encodeURIComponent(parsed.timeRange)}`;
 	}
-	const timeoutSecs = Math.ceil(timeoutMs / 1000);
 
 	// Perform HTTP request
 	const response = httpGet(searchUrl, timeoutSecs);
@@ -803,6 +827,24 @@ function search(query) {
 		const noResultsSubtitle = filterInfo
 			? `Try different keywords · ${filterInfo}`
 			: "Try different keywords";
+		// Return suggestions if available, otherwise show no results error
+		if (suggestionItems.length > 0) {
+			return {
+				items: [
+					...suggestionItems,
+					separatorItem("No Results"),
+					errorItem(
+						"🔍 No results found",
+						noResultsSubtitle,
+						`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+					),
+				],
+				cache: {
+					seconds: 60,
+					loosereload: true,
+				},
+			};
+		}
 		return {
 			items: [
 				errorItem(
@@ -815,9 +857,17 @@ function search(query) {
 	}
 
 	// Transform results to Alfred items
-	const items = data.results.map((result) =>
+	const resultItems = data.results.map((result) =>
 		resultToAlfredItem(result, cleanQuery, searxngUrl, secretKey, parsed.category, parsed.timeRange)
 	);
+
+	// Combine: suggestions first, then separator, then results
+	const items = [];
+	if (suggestionItems.length > 0) {
+		items.push(...suggestionItems);
+		items.push(separatorItem("Results"));
+	}
+	items.push(...resultItems);
 
 	// Add fallback item at the end
 	items.push(fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange));
