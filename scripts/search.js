@@ -885,9 +885,34 @@ function search(query) {
 // ALFRED ENTRY POINT
 // ============================================================================
 
-// biome-ignore lint/correctness/noUnusedVariables: Alfred entry point
-function run(argv) {
-	const query = argv[0] || "";
-	const result = search(query);
-	return JSON.stringify(result);
+/**
+ * Wrap a Script Filter handler to guarantee valid JSON output.
+ * Catches any unhandled exceptions and converts them to Alfred-friendly error items.
+ * @param {function(string[]): object} handler - Function that takes argv and returns an Alfred response object
+ * @returns {function(string[]): string} Wrapped function that returns JSON string
+ */
+function scriptFilter(handler) {
+	return function (argv) {
+		try {
+			return JSON.stringify(handler(argv));
+		} catch (error) {
+			// Log error for debugging (appears in Console.app under osascript)
+			console.log(`Error: ${error.message}`);
+			console.log(error.stack || "No stack trace");
+			// Reuse errorItem helper for consistent structure (includes mods)
+			const item = errorItem("Internal Error", error.message);
+			// Add text property for copy/largetype with stack trace
+			item.text = {
+				copy: error.stack || error.message,
+				largetype: error.stack || error.message,
+			};
+			return JSON.stringify({ items: [item] });
+		}
+	};
 }
+
+// biome-ignore lint/correctness/noUnusedVariables: Alfred entry point
+var run = scriptFilter((argv) => {
+	const query = argv[0] || "";
+	return search(query);
+});
