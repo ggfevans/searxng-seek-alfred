@@ -590,6 +590,19 @@ function fallbackItem(query, searxngUrl, category, timeRange) {
 }
 
 /**
+ * Create a visual separator item for Alfred display.
+ * @param {string} label - Separator label
+ * @returns {object} Alfred item (not selectable)
+ */
+function separatorItem(label) {
+	return {
+		title: `── ${label} ──`,
+		valid: false,
+		icon: { path: "icon.png" },
+	};
+}
+
+/**
  * Transform a SearXNG result into an Alfred item.
  * @param {object} result - SearXNG result object
  * @param {string} query - Original search query
