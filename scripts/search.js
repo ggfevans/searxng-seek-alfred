@@ -257,6 +257,24 @@ function shouldShowFullResults(query) {
 }
 
 /**
+ * Fetch autocomplete suggestions from SearXNG.
+ * @param {string} query - Search query
+ * @param {string} searxngUrl - Base SearXNG URL
+ * @param {number} timeoutSecs - Timeout in seconds
+ * @returns {string[]} Array of suggestions or empty array on error
+ */
+function fetchAutocomplete(query, searxngUrl, timeoutSecs) {
+	const autocompleteUrl = `${searxngUrl}/autocompleter?q=${encodeURIComponent(query)}`;
+	const response = httpGet(autocompleteUrl, Math.min(timeoutSecs, 2)); // Max 2s for autocomplete
+
+	if (!response.success || !response.data) {
+		return [];
+	}
+
+	return parseAutocompleteResponse(response.data);
+}
+
+/**
  * Perform HTTP GET request.
  * @param {string} url - URL to fetch
  * @param {number} timeoutSecs - Timeout in seconds
