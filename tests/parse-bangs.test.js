@@ -5,7 +5,7 @@
  *
  * parseBangs extracts category and time range modifiers from search queries.
  * Category bangs: !i/!images (images), !n/!news (news), !v/!videos (videos), !maps (maps)
- * Time range bangs: !d (day), !w (week), !m (month), !y (year)
+ * Time range bangs: !d (day), !m (month), !y (year)
  */
 
 const assert = require("node:assert");
@@ -13,7 +13,13 @@ const { describe, it } = require("node:test");
 const fs = require("node:fs");
 const path = require("node:path");
 
-// Extract parseBangs function from search.js
+// Extract parseBangs function from search.js via regex.
+// NOTE: This extraction approach is fragile - it depends on the function ending
+// with a closing brace on its own line. If parseBangs is reformatted or contains
+// nested structures that break this pattern, the regex will fail. This is a
+// trade-off for testing pure functions in a JXA codebase that can't use ES modules.
+// Future refactor: move parseBangs to a standalone module that both search.js
+// and tests can import directly. See CLAUDE.md "Future Structure" section.
 const searchJs = fs.readFileSync(
 	path.join(__dirname, "../scripts/search.js"),
 	"utf-8"
@@ -85,12 +91,6 @@ describe("parseBangs", () => {
 			assert.strictEqual(result.query, "breaking news");
 		});
 
-		it("parses !w for week time range", () => {
-			const result = parseBangs("!w recent updates");
-			assert.strictEqual(result.timeRange, "week");
-			assert.strictEqual(result.query, "recent updates");
-		});
-
 		it("parses !m for month time range", () => {
 			const result = parseBangs("!m quarterly report");
 			assert.strictEqual(result.timeRange, "month");
@@ -113,9 +113,9 @@ describe("parseBangs", () => {
 		});
 
 		it("parses time range before category", () => {
-			const result = parseBangs("!w !images landscape");
+			const result = parseBangs("!y !images landscape");
 			assert.strictEqual(result.category, "images");
-			assert.strictEqual(result.timeRange, "week");
+			assert.strictEqual(result.timeRange, "year");
 			assert.strictEqual(result.query, "landscape");
 		});
 
@@ -147,9 +147,9 @@ describe("parseBangs", () => {
 		});
 
 		it("parses multiple bangs scattered in query", () => {
-			const result = parseBangs("latest !n technology !w updates");
+			const result = parseBangs("latest !n technology !y updates");
 			assert.strictEqual(result.category, "news");
-			assert.strictEqual(result.timeRange, "week");
+			assert.strictEqual(result.timeRange, "year");
 			assert.strictEqual(result.query, "latest technology updates");
 		});
 	});
@@ -185,11 +185,6 @@ describe("parseBangs", () => {
 			assert.strictEqual(result.query, "events");
 		});
 
-		it("parses uppercase !W for week", () => {
-			const result = parseBangs("!W reviews");
-			assert.strictEqual(result.timeRange, "week");
-			assert.strictEqual(result.query, "reviews");
-		});
 	});
 
 	describe("unknown bangs", () => {
@@ -295,17 +290,21 @@ describe("parseBangs", () => {
 	});
 
 	describe("edge cases - duplicate bangs", () => {
-		it("last category bang wins when duplicated", () => {
+		it("later-defined bang in categoryBangs wins when multiple present", () => {
 			const result = parseBangs("!i !n search");
-			// When two category bangs are present, the last one wins
+			// The effective category is determined by iteration order of categoryBangs
+			// in parseBangs (see scripts/search.js). Since !n is defined after !i,
+			// and both match, !n's value ("news") becomes the final category.
+			// Note: "!n !i search" would also result in "news" for the same reason.
 			assert.strictEqual(result.category, "news");
 			assert.strictEqual(result.query, "search");
 		});
 
-		it("last time range bang wins when duplicated", () => {
-			const result = parseBangs("!d !w search");
-			// When two time bangs are present, the last one wins
-			assert.strictEqual(result.timeRange, "week");
+		it("later-defined bang in timeRangeBangs wins when multiple present", () => {
+			const result = parseBangs("!d !m search");
+			// The effective timeRange is determined by iteration order of timeRangeBangs
+			// in parseBangs. Since !m is defined after !d, !m's value wins.
+			assert.strictEqual(result.timeRange, "month");
 			assert.strictEqual(result.query, "search");
 		});
 

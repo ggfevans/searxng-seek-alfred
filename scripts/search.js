@@ -114,7 +114,7 @@ function shellEscape(str) {
 /**
  * Parse bang modifiers from query string.
  * Extracts category bangs (!i, !images, !n, !news, !v, !videos, !maps)
- * and time range bangs (!d, !w, !m, !y) from anywhere in the query.
+ * and time range bangs (!d, !m, !y) from anywhere in the query.
  * @param {string} query - Raw query string with potential bangs
  * @returns {{query: string, category: string|undefined, timeRange: string|undefined}}
  */
@@ -129,9 +129,9 @@ function parseBangs(query) {
 		"!maps": "maps",
 	};
 
+	// SearXNG only supports: day, month, year (not week)
 	const timeRangeBangs = {
 		"!d": "day",
-		"!w": "week",
 		"!m": "month",
 		"!y": "year",
 	};
@@ -140,12 +140,17 @@ function parseBangs(query) {
 	let timeRange;
 	let cleanQuery = query;
 
-	// Helper to replace a bang, handling spacing correctly
+	// Helper to replace a bang, handling spacing correctly.
+	// The regex captures: (before)(bang)(after) where before/after are whitespace or boundaries.
+	// Three cases with intentionally asymmetric returns:
+	// 1. Bang at start (before is empty): remove bang entirely, no leading space needed
+	// 2. Bang at end (after is empty): preserve the leading space from 'before'
+	// 3. Bang between words: collapse to single space to avoid double-spacing
 	const replaceBang = (str, regex) => {
 		return str.replace(regex, (match, before, after) => {
-			if (before === "" || before === undefined) return after === "" ? "" : "";
-			if (after === "" || after === undefined) return before;
-			return " "; // Between words: collapse to single space
+			if (before === "" || before === undefined) return ""; // Case 1: bang at start
+			if (after === "" || after === undefined) return before; // Case 2: bang at end
+			return " "; // Case 3: bang between words
 		});
 	};
 
