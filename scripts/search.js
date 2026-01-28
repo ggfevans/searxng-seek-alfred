@@ -245,6 +245,18 @@ function suggestionToAlfredItem(suggestion, category, timeRange) {
 }
 
 /**
+ * Determine if query is long enough to show full search results.
+ * Short queries (≤3 chars) show only autocomplete for speed.
+ * Longer queries show both autocomplete and full results.
+ * @param {string} query - Clean query (after bang extraction)
+ * @returns {boolean} True if full results should be fetched
+ */
+function shouldShowFullResults(query) {
+	const trimmed = query.trim();
+	return trimmed.length > 3;
+}
+
+/**
  * Perform HTTP GET request.
  * @param {string} url - URL to fetch
  * @param {number} timeoutSecs - Timeout in seconds

@@ -121,3 +121,53 @@ describe("suggestionToAlfredItem", () => {
 		assert.strictEqual(item.variables, undefined);
 	});
 });
+
+// Extract shouldShowFullResults function
+const thresholdFn = searchJs.match(
+	/function shouldShowFullResults\(query\) \{[\s\S]*?\n\}/
+);
+if (!thresholdFn) {
+	throw new Error("Could not find shouldShowFullResults function in search.js");
+}
+// eslint-disable-next-line no-eval
+const shouldShowFullResults = eval(`(${thresholdFn[0]})`);
+
+describe("shouldShowFullResults", () => {
+	describe("short queries (≤3 chars) - autocomplete only", () => {
+		it("returns false for 1 char", () => {
+			assert.strictEqual(shouldShowFullResults("a"), false);
+		});
+
+		it("returns false for 2 chars", () => {
+			assert.strictEqual(shouldShowFullResults("ab"), false);
+		});
+
+		it("returns false for 3 chars", () => {
+			assert.strictEqual(shouldShowFullResults("abc"), false);
+		});
+
+		it("returns false for empty string", () => {
+			assert.strictEqual(shouldShowFullResults(""), false);
+		});
+	});
+
+	describe("longer queries (>3 chars) - full results", () => {
+		it("returns true for 4 chars", () => {
+			assert.strictEqual(shouldShowFullResults("abcd"), true);
+		});
+
+		it("returns true for long query", () => {
+			assert.strictEqual(shouldShowFullResults("climate change"), true);
+		});
+	});
+
+	describe("edge cases", () => {
+		it("counts actual characters, not bytes", () => {
+			assert.strictEqual(shouldShowFullResults("café"), true); // 4 chars
+		});
+
+		it("trims whitespace before counting", () => {
+			assert.strictEqual(shouldShowFullResults("  ab  "), false); // 2 chars after trim
+		});
+	});
+});
