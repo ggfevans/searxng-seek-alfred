@@ -52,10 +52,27 @@ function parseTimeout(value, defaultMs = 5000, maxMs = 30000) {
 	return Math.min(parsed, maxMs);
 }
 
+/**
+ * Parse boolean environment variable.
+ * Returns defaultValue for undefined, null, or empty string.
+ * Otherwise treats "0", "false", "no" (case-insensitive) as false; everything else as true.
+ * @param {string} value - String value to parse
+ * @param {boolean} [defaultValue=true] - Default if value is undefined, null, or empty
+ * @returns {boolean}
+ */
+function parseBool(value, defaultValue = true) {
+	if (value === undefined || value === null || value === "") {
+		return defaultValue;
+	}
+	const lower = value.toLowerCase();
+	return lower !== "0" && lower !== "false" && lower !== "no";
+}
+
 const CONFIG = {
 	searxngUrl: getEnv("searxng_url"),
 	timeoutMs: parseTimeout(getEnv("timeout_ms", "5000")),
 	secretKey: getEnv("secret_key", ""), // For SearXNG favicon proxy HMAC
+	enableResultCache: parseBool(getEnv("enable_result_cache", "1")),
 };
 
 // ============================================================================
@@ -622,6 +639,23 @@ function separatorItem(label) {
 }
 
 /**
+ * Build Alfred response object with optional caching.
+ * @param {object[]} items - Array of Alfred items
+ * @param {number} [cacheSeconds] - Cache duration in seconds (omit or use 0 to disable caching)
+ * @returns {object} Alfred response object
+ */
+function buildResponse(items, cacheSeconds) {
+	const response = { items };
+	if (CONFIG.enableResultCache && cacheSeconds > 0) {
+		response.cache = {
+			seconds: cacheSeconds,
+			loosereload: true,
+		};
+	}
+	return response;
+}
+
+/**
  * Transform a SearXNG result into an Alfred item.
  * @param {object} result - SearXNG result object
  * @param {string} query - Original search query
@@ -750,13 +784,7 @@ function search(query) {
 		if (items.length === 0) {
 			items.push(fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange));
 		}
-		return {
-			items: items,
-			cache: {
-				seconds: 30,
-				loosereload: true,
-			},
-		};
+		return buildResponse(items, 30);
 	}
 
 	// Longer queries: fetch full results too
@@ -848,31 +876,23 @@ function search(query) {
 			: "Try different keywords";
 		// Return suggestions if available, otherwise show no results error
 		if (suggestionItems.length > 0) {
-			return {
-				items: [
-					...suggestionItems,
-					separatorItem("No Results"),
-					errorItem(
-						"🔍 No results found",
-						noResultsSubtitle,
-						`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
-					),
-				],
-				cache: {
-					seconds: 60,
-					loosereload: true,
-				},
-			};
-		}
-		return {
-			items: [
+			return buildResponse([
+				...suggestionItems,
+				separatorItem("No Results"),
 				errorItem(
 					"🔍 No results found",
 					noResultsSubtitle,
 					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
 				),
-			],
-		};
+			], 60);
+		}
+		return buildResponse([
+			errorItem(
+				"🔍 No results found",
+				noResultsSubtitle,
+				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+			),
+		]);
 	}
 
 	// Transform results to Alfred items
@@ -891,13 +911,7 @@ function search(query) {
 	// Add fallback item at the end
 	items.push(fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange));
 
-	return {
-		items: items,
-		cache: {
-			seconds: 60,
-			loosereload: true,
-		},
-	};
+	return buildResponse(items, 60);
 }
 
 // ============================================================================
