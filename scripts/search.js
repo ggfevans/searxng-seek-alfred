@@ -398,6 +398,26 @@ function getCachedFavicon(domain) {
 }
 
 /**
+ * Normalize HMAC output from openssl/LibreSSL.
+ * Different versions output different formats:
+ * - macOS LibreSSL: Just the hex hash (e.g., "6afeb25a205f6b...")
+ * - OpenSSL: Prefixed with label (e.g., "SHA2-256(stdin)= 6afeb25a205f6b...")
+ * @param {string} output - Raw output from openssl dgst command
+ * @returns {string} Normalized hex-only HMAC
+ */
+function normalizeHmacOutput(output) {
+	const trimmed = output.trim();
+	// Handle OpenSSL's prefixed format: "LABEL(stdin)= HASH"
+	// The '= ' (equals followed by space) is the delimiter before the hash
+	const eqIndex = trimmed.lastIndexOf("= ");
+	if (eqIndex !== -1) {
+		return trimmed.slice(eqIndex + 2);
+	}
+	// LibreSSL format: just the hash
+	return trimmed;
+}
+
+/**
  * Compute HMAC-SHA256 for SearXNG favicon proxy authentication.
  * Uses openssl which is available on all macOS systems.
  * @param {string} secretKey - SearXNG server secret key
@@ -408,10 +428,9 @@ function computeHmac(secretKey, authority) {
 	try {
 		// HMAC-SHA256 using openssl (matches SearXNG's new_hmac function)
 		// printf ensures no trailing newline
-		// macOS LibreSSL outputs just the hex digest (no prefix)
 		const cmd = `printf '%s' ${shellEscape(authority)} | openssl dgst -sha256 -hmac ${shellEscape(secretKey)}`;
-		const hmac = app.doShellScript(cmd);
-		return hmac.trim();
+		const output = app.doShellScript(cmd);
+		return normalizeHmacOutput(output);
 	} catch {
 		return null;
 	}
