@@ -188,6 +188,25 @@ function parseBangs(query) {
 }
 
 /**
+ * Parse SearXNG autocomplete response.
+ * Response format: ["query", ["suggestion1", "suggestion2", ...]]
+ * @param {string} responseData - Raw JSON response string
+ * @returns {string[]} Array of suggestions or empty array on error
+ */
+function parseAutocompleteResponse(responseData) {
+	if (!responseData) return [];
+	try {
+		const parsed = JSON.parse(responseData);
+		if (!Array.isArray(parsed) || parsed.length < 2 || !Array.isArray(parsed[1])) {
+			return [];
+		}
+		return parsed[1];
+	} catch {
+		return [];
+	}
+}
+
+/**
  * Perform HTTP GET request.
  * @param {string} url - URL to fetch
  * @param {number} timeoutSecs - Timeout in seconds
