@@ -122,4 +122,21 @@ describe("errorItem", () => {
 			assert.ok(item.text.copy, "Should still have copy text");
 		});
 	});
+
+	describe("debug info format", () => {
+		it("formats details with key: value pairs", () => {
+			const item = errorItem("Error", "Desc", null, {
+				query: "test",
+				url: "https://example.com",
+			});
+			// Check format: each detail on its own line with indent
+			assert.ok(item.text.copy.includes("query: test"));
+			assert.ok(item.text.copy.includes("url: https://example.com"));
+		});
+
+		it("has consistent copy and largetype content", () => {
+			const item = errorItem("Error", "Desc", null, { key: "value" });
+			assert.strictEqual(item.text.copy, item.text.largetype);
+		});
+	});
 });
