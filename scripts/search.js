@@ -758,7 +758,9 @@ function search(query) {
 			items: [
 				errorItem(
 					"⚠️ SearXNG URL not configured",
-					"Set searxng_url in workflow settings"
+					"Set searxng_url in workflow settings",
+					null,
+					{ query: query }
 				),
 			],
 		};
@@ -832,7 +834,8 @@ function search(query) {
 				errorItem(
 					"⚠️ Cannot reach SearXNG",
 					"Check your connection",
-					searxngUrl
+					searxngUrl,
+					{ query: cleanQuery, url: searxngUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -846,7 +849,8 @@ function search(query) {
 				errorItem(
 					"⏱️ Empty response",
 					"SearXNG returned no data",
-					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+					{ query: cleanQuery, url: searchUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -865,7 +869,8 @@ function search(query) {
 					errorItem(
 						"🔒 JSON API not enabled",
 						"Enable json format in SearXNG settings.yml",
-						"https://docs.searxng.org/admin/settings/settings_search.html#settings-search"
+						"https://docs.searxng.org/admin/settings/settings_search.html#settings-search",
+						{ query: cleanQuery, url: searxngUrl, hint: "Response was HTML, not JSON" }
 					),
 					fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 				],
@@ -876,7 +881,8 @@ function search(query) {
 				errorItem(
 					"❌ Invalid response",
 					"Check if JSON format is enabled",
-					searxngUrl
+					searxngUrl,
+					{ query: cleanQuery, url: searxngUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -887,7 +893,7 @@ function search(query) {
 	if (data.error) {
 		return {
 			items: [
-				errorItem("❌ API Error", data.error, searxngUrl),
+				errorItem("❌ API Error", data.error, searchUrl, { query: cleanQuery, url: searchUrl }),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
 		};
@@ -907,7 +913,8 @@ function search(query) {
 				errorItem(
 					"🔍 No results found",
 					noResultsSubtitle,
-					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+					{ query: cleanQuery, category: parsed.category, timeRange: parsed.timeRange }
 				),
 			], 60);
 		}
@@ -915,7 +922,8 @@ function search(query) {
 			errorItem(
 				"🔍 No results found",
 				noResultsSubtitle,
-				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+				{ query: cleanQuery, category: parsed.category, timeRange: parsed.timeRange }
 			),
 		], 60);
 	}
