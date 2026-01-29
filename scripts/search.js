@@ -577,16 +577,40 @@ function formatFilterSubtitle(category, timeRange) {
 
 /**
  * Create an error item for Alfred display.
+ * Includes debug info accessible via Cmd+C (copy) and Cmd+L (largetype).
  * @param {string} title - Error title
  * @param {string} subtitle - Error description
  * @param {string} [arg] - URL to open on Enter
+ * @param {object} [details] - Additional debug context (query, url, etc.)
  * @returns {object} Alfred item
  */
-function errorItem(title, subtitle, arg) {
+function errorItem(title, subtitle, arg, details) {
+	// Build debug info for copy/largetype
+	const workflowVersion = getEnv("alfred_workflow_version", "unknown");
+	const alfredVersion = getEnv("alfred_version", "unknown");
+
+	let debugInfo = `${title}: ${subtitle}`;
+
+	if (details && Object.keys(details).length > 0) {
+		debugInfo += "\n\nDetails:";
+		for (const key in details) {
+			if (Object.prototype.hasOwnProperty.call(details, key)) {
+				debugInfo += `\n  ${key}: ${details[key]}`;
+			}
+		}
+	}
+
+	debugInfo += `\n\nWorkflow: v${workflowVersion}`;
+	debugInfo += `\nAlfred: ${alfredVersion}`;
+
 	const item = {
 		title: title,
 		subtitle: subtitle,
 		valid: arg ? true : false,
+		text: {
+			copy: debugInfo,
+			largetype: debugInfo,
+		},
 		mods: {
 			cmd: { valid: false, subtitle: "" },
 			alt: { valid: false, subtitle: "" },
@@ -734,7 +758,9 @@ function search(query) {
 			items: [
 				errorItem(
 					"⚠️ SearXNG URL not configured",
-					"Set searxng_url in workflow settings"
+					"Set searxng_url in workflow settings",
+					null,
+					{ query: query }
 				),
 			],
 		};
@@ -808,7 +834,8 @@ function search(query) {
 				errorItem(
 					"⚠️ Cannot reach SearXNG",
 					"Check your connection",
-					searxngUrl
+					searxngUrl,
+					{ query: cleanQuery, url: searxngUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -822,7 +849,8 @@ function search(query) {
 				errorItem(
 					"⏱️ Empty response",
 					"SearXNG returned no data",
-					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+					{ query: cleanQuery, url: searchUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -841,7 +869,8 @@ function search(query) {
 					errorItem(
 						"🔒 JSON API not enabled",
 						"Enable json format in SearXNG settings.yml",
-						"https://docs.searxng.org/admin/settings/settings_search.html#settings-search"
+						"https://docs.searxng.org/admin/settings/settings_search.html#settings-search",
+						{ query: cleanQuery, url: searxngUrl, hint: "Response was HTML, not JSON" }
 					),
 					fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 				],
@@ -852,7 +881,8 @@ function search(query) {
 				errorItem(
 					"❌ Invalid response",
 					"Check if JSON format is enabled",
-					searxngUrl
+					searxngUrl,
+					{ query: cleanQuery, url: searxngUrl }
 				),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
@@ -863,7 +893,7 @@ function search(query) {
 	if (data.error) {
 		return {
 			items: [
-				errorItem("❌ API Error", data.error, searxngUrl),
+				errorItem("❌ API Error", data.error, searchUrl, { query: cleanQuery, url: searchUrl }),
 				fallbackItem(cleanQuery, searxngUrl, parsed.category, parsed.timeRange),
 			],
 		};
@@ -883,7 +913,8 @@ function search(query) {
 				errorItem(
 					"🔍 No results found",
 					noResultsSubtitle,
-					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+					`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+					{ query: cleanQuery, category: parsed.category, timeRange: parsed.timeRange }
 				),
 			], 60);
 		}
@@ -891,7 +922,8 @@ function search(query) {
 			errorItem(
 				"🔍 No results found",
 				noResultsSubtitle,
-				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
+				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`,
+				{ query: cleanQuery, category: parsed.category, timeRange: parsed.timeRange }
 			),
 		], 60);
 	}
@@ -939,8 +971,9 @@ function scriptFilter(handler) {
 			console.log(`Error: ${message}`);
 			console.log(stack);
 			// Reuse errorItem helper for consistent structure (includes mods)
-			const item = errorItem("Internal Error", message);
-			// Add text property for copy/largetype with stack trace
+			const item = errorItem("Internal Error", message, null, { stack: stack });
+			// Override text property for copy/largetype with raw stack trace
+			// (more useful than formatted debug info for internal errors)
 			item.text = {
 				copy: stack,
 				largetype: stack,

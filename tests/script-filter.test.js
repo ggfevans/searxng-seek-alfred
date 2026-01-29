@@ -17,7 +17,7 @@ const searchJs = fs.readFileSync(
 
 // Extract errorItem - needed by scriptFilter
 const errorItemMatch = searchJs.match(
-	/function errorItem\(title, subtitle, arg(?:, text)?\) \{[\s\S]*?return \{[\s\S]*?\};\s*\}/
+	/function errorItem\(title, subtitle, arg(?:, details)?\) \{[\s\S]*?return item;\s*\}/
 );
 if (!errorItemMatch) {
 	throw new Error("Could not find errorItem function in search.js");
@@ -29,6 +29,16 @@ const scriptFilterMatch = searchJs.match(
 );
 if (!scriptFilterMatch) {
 	throw new Error("Could not find scriptFilter function in search.js");
+}
+
+// Mock getEnv for testing (errorItem depends on it for debug info)
+// eslint-disable-next-line no-unused-vars
+function getEnv(name, defaultValue) {
+	const mockEnv = {
+		alfred_workflow_version: "1.0.0",
+		alfred_version: "5.0",
+	};
+	return mockEnv[name] || defaultValue || "";
 }
 
 // Evaluate both functions (errorItem first, then scriptFilter which uses it)
