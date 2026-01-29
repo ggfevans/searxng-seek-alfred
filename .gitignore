@@ -10,3 +10,6 @@ prefs.plist
 
 # Node
 node_modules/
+
+# Git worktrees
+.worktree/
