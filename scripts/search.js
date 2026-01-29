@@ -423,6 +423,7 @@ function getCachedFavicon(domain) {
  * @returns {string} Normalized hex-only HMAC
  */
 function normalizeHmacOutput(output) {
+	if (output == null) return "";
 	const trimmed = output.trim();
 	// Handle OpenSSL's prefixed format: "LABEL(stdin)= HASH"
 	// The '= ' (equals followed by space) is the delimiter before the hash
@@ -892,7 +893,7 @@ function search(query) {
 				noResultsSubtitle,
 				`${searxngUrl}/search?q=${encodeURIComponent(cleanQuery)}`
 			),
-		]);
+		], 60);
 	}
 
 	// Transform results to Alfred items
@@ -927,17 +928,22 @@ function search(query) {
 function scriptFilter(handler) {
 	return function (argv) {
 		try {
-			return JSON.stringify(handler(argv));
-		} catch (error) {
+			const result = handler(argv);
+			// Coerce undefined/null to empty response
+			return JSON.stringify(result || { items: [] });
+		} catch (err) {
+			// Normalize thrown values - handle non-Error throws
+			const message = (err && err.message) || String(err);
+			const stack = (err && err.stack) || String(err);
 			// Log error for debugging (appears in Console.app under osascript)
-			console.log(`Error: ${error.message}`);
-			console.log(error.stack || "No stack trace");
+			console.log(`Error: ${message}`);
+			console.log(stack);
 			// Reuse errorItem helper for consistent structure (includes mods)
-			const item = errorItem("Internal Error", error.message);
+			const item = errorItem("Internal Error", message);
 			// Add text property for copy/largetype with stack trace
 			item.text = {
-				copy: error.stack || error.message,
-				largetype: error.stack || error.message,
+				copy: stack,
+				largetype: stack,
 			};
 			return JSON.stringify({ items: [item] });
 		}

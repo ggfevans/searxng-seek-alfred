@@ -116,6 +116,16 @@ describe("buildResponse", () => {
 		});
 	});
 
+	describe("no-results response caching", () => {
+		it("should be called with cache for no-results empty suggestions case", () => {
+			// This is a documentation test - the actual fix is in search.js
+			// Verifying buildResponse accepts the cache parameter
+			const result = buildResponse([{ title: "No results" }], 60);
+			assert.ok(result.cache, "Should have cache property");
+			assert.strictEqual(result.cache.seconds, 60);
+		});
+	});
+
 	describe("items passthrough", () => {
 		it("passes through empty items array", () => {
 			const result = buildResponse([], 60);
