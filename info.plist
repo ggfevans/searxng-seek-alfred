@@ -225,7 +225,7 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>**Seek** — Private web search via SearXNG. Optimized for personal instances, works with public instances too.
+	<string>**Seek** — An Alfred workflow for private web search via SearXNG. Optimized for personal instances, works with public instances too.
 
 ## Setup
 

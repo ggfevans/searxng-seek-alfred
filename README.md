@@ -4,7 +4,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/ggfevans/searxng-alfred-seek?style=flat-square)](https://github.com/ggfevans/searxng-alfred-seek/releases/latest)
 [![License](https://img.shields.io/github/license/ggfevans/searxng-alfred-seek?style=flat-square)](LICENSE)
 
-Private web search via [SearXNG](https://docs.searxng.org/) — optimized for personal instances, works with public instances too.
+An [Alfred](https://www.alfredapp.com/) workflow for private web search via [SearXNG](https://docs.searxng.org/). Optimized for personal instances, works with public instances too.
 
 <img width="567" height="476" alt="Alfred interface" align="center" src="https://github.com/user-attachments/assets/d2c426bc-110f-4c19-b29b-a20e70cf7bd8" />
 
