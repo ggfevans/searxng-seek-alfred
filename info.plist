@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>ca.gvns.seek</string>
+	<string>ca.gvns.seek.alfred</string>
 	<key>category</key>
 	<string>Internet</string>
 	<key>connections</key>
