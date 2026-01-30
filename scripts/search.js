@@ -366,6 +366,7 @@ function getWorkflowDataDir() {
 /**
  * Get the favicons cache directory path.
  * Creates the directory if it doesn't exist. Memoized for performance.
+ * Version-scoped to auto-invalidate cache when workflow is updated.
  * @returns {string} Absolute path to favicons directory
  */
 function getCacheDir() {
@@ -373,7 +374,8 @@ function getCacheDir() {
 		return cachedFaviconDir;
 	}
 
-	const cacheDir = `${getWorkflowDataDir()}/favicons`;
+	const version = getEnv("alfred_workflow_version", "0.0.0");
+	const cacheDir = `${getWorkflowDataDir()}/favicons_v${version}`;
 	app.doShellScript(`mkdir -p ${shellEscape(cacheDir)}`);
 
 	cachedFaviconDir = cacheDir;
