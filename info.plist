@@ -225,65 +225,41 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>**Seek** — An Alfred workflow for private web search via SearXNG. Optimized for personal instances, works with public instances too.
+	<string>## Seek — SearXNG Search for Alfred
 
-## Setup
+Private web search via your SearXNG instance with inline results.
 
-1. Set your SearXNG URL in the workflow configuration
-2. Ensure your SearXNG instance has JSON format enabled in settings.yml:
+### Quick Start
 
-   search:
-     formats:
-       - html
-       - json
+1. Set your SearXNG URL (must have JSON format enabled)
+2. Type `sx query` or `seek query` to search
 
-### Favicons (Optional)
+### Search Modifiers
 
-To display website favicons in search results:
+Use bang commands in your query for filtering:
 
-1. Enable favicon support in your SearXNG settings.yml:
+**Categories:** `!images`, `!news`, `!videos`, `!it`, `!science`, `!files`, `!music`, `!social`
+**Time ranges:** `!d` (day), `!w` (week), `!m` (month), `!y` (year)
 
-   search:
-     favicon_resolver: "duckduckgo"
+Example: `sx !images !m cats` — images from the past month
 
-2. Copy your secret_key from settings.yml (server.secret_key) into the workflow configuration
-
-Favicons are fetched through your own SearXNG instance's favicon proxy, preserving privacy.
-
-### Public Instances
-
-Works with any SearXNG instance with JSON enabled. Public instances won't have favicon support (requires secret_key). For full features, self-host.
-
-### Replace Default Web Search (Optional)
-
-To use SearXNG as your default fallback search (instead of Google):
-
-1. Open Alfred Preferences → Features → Default Results
-2. Click "Setup fallback results" at the bottom
-3. Click + and find "Seek" under this workflow
-4. Drag it to the top of the list (or remove Google)
-
-Now when you type anything and press Enter, it searches SearXNG!
-
-## Usage
-
-- Type `sx` or `seek` followed by your search query (shows results in Alfred)
-- Or use as fallback search (opens SearXNG in browser)
-- Press Enter to open the result in your browser
-- Press ⌘C to copy the URL
-- Press ⌘L to show the title in Large Type
-- Press ⌥ Enter to open the search in SearXNG web interface
-- Press Shift or ⌘Y for Quick Look preview
-
-## Keyboard Shortcuts
+### Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| Enter | Open URL in browser |
-| ⌘C | Copy URL to clipboard |
-| ⌘L | Show title in Large Type |
-| ⌥ Enter | View in SearXNG web UI |
-| Shift / ⌘Y | Quick Look preview |
+| ↩ | Open in browser |
+| ⌥↩ | Open in SearXNG web UI |
+| ⌘C | Copy URL |
+| ⌘L | Large Type (full details) |
+| ⇧ / ⌘Y | Quick Look preview |
+
+### Favicons (Self-hosted)
+
+To show website favicons, add your secret_key from settings.yml (server.secret_key). Requires favicon_resolver enabled in your SearXNG config.
+
+### Fallback Search
+
+Replace default web search: Alfred Preferences → Features → Default Results → Setup fallback results → Add "Seek"
 </string>
 	<key>uidata</key>
 	<dict>
@@ -338,34 +314,13 @@ Now when you type anything and press Enter, it searches SearXNG!
 				<true/>
 			</dict>
 			<key>description</key>
-			<string>The URL of your SearXNG instance (e.g., https://search.example.com). The instance must have JSON format enabled in settings.yml.</string>
+			<string>Your SearXNG instance URL. Must have JSON format enabled.</string>
 			<key>label</key>
 			<string>SearXNG URL</string>
 			<key>type</key>
 			<string>textfield</string>
 			<key>variable</key>
 			<string>searxng_url</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<string>5000</string>
-				<key>placeholder</key>
-				<string>5000</string>
-				<key>required</key>
-				<false/>
-				<key>trim</key>
-				<true/>
-			</dict>
-			<key>description</key>
-			<string>Request timeout in milliseconds. Increase if your SearXNG instance is slow or on a high-latency connection.</string>
-			<key>label</key>
-			<string>Timeout (ms)</string>
-			<key>type</key>
-			<string>textfield</string>
-			<key>variable</key>
-			<string>timeout_ms</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -380,13 +335,49 @@ Now when you type anything and press Enter, it searches SearXNG!
 				<true/>
 			</dict>
 			<key>description</key>
-			<string>Secret key from your SearXNG settings.yml (server.secret_key). Required to display website favicons via SearXNG's favicon proxy. Leave empty to disable favicons.</string>
+			<string>From settings.yml (server.secret_key). Enables favicon display. Leave empty to disable.</string>
 			<key>label</key>
-			<string>Secret Key (for favicons)</string>
+			<string>Secret Key</string>
 			<key>type</key>
 			<string>textfield</string>
 			<key>variable</key>
 			<string>secret_key</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>5000</string>
+				<key>placeholder</key>
+				<string>5000</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Request timeout in milliseconds. Increase for slow connections.</string>
+			<key>label</key>
+			<string>Timeout (ms)</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>timeout_ms</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Cache search results for faster re-display while typing.</string>
+			<key>label</key>
+			<string>Enable Result Cache</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>enable_result_cache</string>
 		</dict>
 	</array>
 	<key>version</key>
