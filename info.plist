@@ -71,11 +71,11 @@
 	<key>createdby</key>
 	<string>ggfevans</string>
 	<key>description</key>
-	<string>SearXNG search for Alfred — private web search with inline results</string>
+	<string>SearXNG for Alfred: private web search with inline results</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Seek</string>
+	<string>Seek - SearXNG for Alfred</string>
 	<key>objects</key>
 	<array>
 		<dict>

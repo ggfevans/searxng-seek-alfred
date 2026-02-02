@@ -1,13 +1,13 @@
 {
-  "name": "seek",
-  "version": "0.2.0",
-  "private": true,
-  "description": "SearXNG search for Alfred — private web search with inline results",
-  "scripts": {
-    "test": "node --test tests/*.test.js",
-    "postversion": "node scripts/sync-version.js && git add info.plist"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+	"name": "searxng-seek-alfred",
+	"version": "0.2.0",
+	"private": true,
+	"description": "SearXNG search for Alfred: private web search with inline results",
+	"scripts": {
+		"test": "node --test tests/*.test.js",
+		"postversion": "node scripts/sync-version.js && git add info.plist"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	}
 }
