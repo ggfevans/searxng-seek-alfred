@@ -207,8 +207,9 @@ function parseBangs(query) {
 /**
  * Parse SearXNG autocomplete response.
  * Response format: ["query", ["suggestion1", "suggestion2", ...]]
+ * Limits to first 5 suggestions for performance.
  * @param {string} responseData - Raw JSON response string
- * @returns {string[]} Array of suggestions or empty array on error
+ * @returns {string[]} Array of suggestions (max 5) or empty array on error
  */
 function parseAutocompleteResponse(responseData) {
 	if (!responseData) return [];
@@ -217,7 +218,8 @@ function parseAutocompleteResponse(responseData) {
 		if (!Array.isArray(parsed) || parsed.length < 2 || !Array.isArray(parsed[1])) {
 			return [];
 		}
-		return parsed[1];
+		// Limit to 5 suggestions for performance and UI clarity
+		return parsed[1].slice(0, 5);
 	} catch {
 		return [];
 	}
@@ -862,6 +864,7 @@ function search(query) {
 	const timeoutSecs = Math.ceil(timeoutMs / 1000);
 
 	// Fetch autocomplete suggestions (always, for any query length)
+	// Limited to 5 results by parseAutocompleteResponse for performance
 	const suggestions = fetchAutocomplete(cleanQuery, searxngUrl, timeoutSecs);
 	const suggestionItems = suggestions.map((s) =>
 		suggestionToAlfredItem(s, searxngUrl, parsed.category, parsed.timeRange)
