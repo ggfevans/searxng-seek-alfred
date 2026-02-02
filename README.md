@@ -1,8 +1,8 @@
 # Seek: Alfred Workflow for SearXNG
 
-[![GitHub Downloads](https://img.shields.io/github/downloads/ggfevans/searxng-alfred-seek/total?style=flat-square&logo=github)](https://github.com/ggfevans/searxng-alfred-seek/releases)
-[![Latest Release](https://img.shields.io/github/v/release/ggfevans/searxng-alfred-seek?style=flat-square)](https://github.com/ggfevans/searxng-alfred-seek/releases/latest)
-[![License](https://img.shields.io/github/license/ggfevans/searxng-alfred-seek?style=flat-square)](LICENSE)
+[![GitHub Downloads](https://img.shields.io/github/downloads/ggfevans/searxng-seek-alfred/total?style=flat-square&logo=github)](https://github.com/ggfevans/searxng-seek-alfred/releases)
+[![Latest Release](https://img.shields.io/github/v/release/ggfevans/searxng-seek-alfred?style=flat-square)](https://github.com/ggfevans/searxng-seek-alfred/releases/latest)
+[![License](https://img.shields.io/github/license/ggfevans/searxng-seek-alfred?style=flat-square)](LICENSE)
 
 An [Alfred](https://www.alfredapp.com/) workflow for private web search via [SearXNG](https://docs.searxng.org/). Optimized for personal instances, works with public instances too.
 
@@ -17,13 +17,13 @@ An [Alfred](https://www.alfredapp.com/) workflow for private web search via [Sea
 
 ## Installation
 
-1. Download the latest `.alfredworkflow` from [Releases](https://github.com/ggfevans/searxng-alfred-seek/releases/latest)
+1. Download the latest `.alfredworkflow` from [Releases](https://github.com/ggfevans/searxng-seek-alfred/releases/latest)
 2. Double-click to install in Alfred
 3. Configure your SearXNG URL in the workflow settings
 
 ## Usage
 
-Type `sx` or `seek` followed by your search query:
+Type `sx` or `seek` followed by your search query (keywords configurable in settings):
 
 | Key | Action |
 |-----|--------|
@@ -50,6 +50,8 @@ Configure in Alfred Preferences → Workflows → Seek → Configure Workflow:
 | Setting | Required | Description |
 |---------|----------|-------------|
 | SearXNG URL | Yes | Your instance URL (e.g., `https://search.example.com`) |
+| Search Keyword | Yes | Primary trigger keyword (default: `sx`) |
+| Alternative Keyword | No | Secondary trigger keyword (default: `seek`). Leave empty to disable. |
 | Timeout (ms) | No | Request timeout, default 5000 |
 | Secret Key | No | For favicon support (see below) |
 

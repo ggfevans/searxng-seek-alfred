@@ -229,10 +229,10 @@
 
 Private web search with inline results.
 
-[Report a bug](https://github.com/ggfevans/searxng-alfred-seek/issues/new) | [GitHub](https://github.com/ggfevans/searxng-alfred-seek)
+[Report a bug](https://github.com/ggfevans/searxng-seek-alfred/issues/new) | [GitHub](https://github.com/ggfevans/searxng-seek-alfred)
 
 ## Usage
-- Type `sx` or `seek` followed by your search query.
+- Type `sx` or `seek` followed by your search query (keywords configurable in settings):
 	* &lt;kbd&gt;⏎&lt;/kbd&gt;: Open result in browser.
 	* &lt;kbd&gt;⌥⏎&lt;/kbd&gt;: Open in SearXNG web UI.
 	* &lt;kbd&gt;⌘C&lt;/kbd&gt;: Copy URL.
@@ -418,6 +418,6 @@ Private web search with inline results.
 	<key>version</key>
 	<string>0.2.0</string>
 	<key>webaddress</key>
-	<string>https://github.com/ggfevans/searxng-alfred-seek</string>
+	<string>https://github.com/ggfevans/searxng-seek-alfred</string>
 </dict>
 </plist>
